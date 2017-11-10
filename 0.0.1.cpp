@@ -1,6 +1,7 @@
 #include <iostream>
-#include<sstream>
+#include <sstream>
 #include <array>
+
 using namespace std;
 
 void choice(unsigned char turn)
