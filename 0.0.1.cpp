@@ -1,151 +1,135 @@
 #include <iostream>
 #include <sstream>
-#include <array>
 
 using namespace std;
 
-void choice(unsigned char turn)
-{
-	if (turn % 2)
-		cout << "O";
-	else
-		cout << "X";
-}
+int quit, ex;
 
-bool sign(unsigned char * a, unsigned char target, unsigned char turn)
+void options(char turn, char *a)
 {
-	return ((a[target - 49] == 0) && (a[target - 49] = (turn % 2) + 1));
-}
-
-bool win(unsigned char * a)
-{
-	if ((a[4] && (a[0] == a[4]) && (a[4] == a[8])) || (a[4] && (a[2] == a[4]) && (a[4] == a[6])))
-		return true;
-	else
+	int j = 0;
+	for (int i = 0; i < 9; i++)
 	{
-		for (unsigned int i = 0; i < 3; i++)
+		if (!(a[i] == 'X' || a[i] == 'O'))
 		{
-			if ((a[i + 3] && (a[i] == a[i + 3]) && (a[i + 3] == a[i + 6])) || (a[3 * i + 1] && (a[3 * i] == a[3 * i + 1]) && (a[3 * i + 1] == a[3 * i + 2])))
-				return true;
+			if (i < 3) 
+				cout << ++j << ".mark cell a" << i + 1 << " as " << turn << endl;
+			if (i>2 && i<6) 
+				cout << ++j << ".mark cell b" << i - 2 << " as " << turn << endl;
+			if (i>5) 
+				cout << ++j << ".mark cell c" << i - 5 << " as " << turn << endl;
 		}
 	}
-
-	return false;
+	cout << ++j << ". quit" << endl;
+	quit = j;
 }
 
-void print_frame(unsigned char * a);
-
-void print_options(unsigned char * a, unsigned char turn);
-
-int main()
+void cells(char *a)
 {
-	unsigned char  a[9] = {};
-	unsigned char target;
+	cout << "   1   2   3" << endl;
+	cout << " +---+---+---+" << endl;
+	cout << "a| " << a[0] << " | " << a[1] << " | " << a[2] << " |" << endl;
+	cout << " +---+---+---+" << endl;
+	cout << "b| " << a[3] << " | " << a[4] << " | " << a[5] << " |" << endl;
+	cout << " +---+---+---+" << endl;
+	cout << "c| " << a[6] << " | " << a[7] << " | " << a[8] << " |" << endl;
+	cout << " +---+---+---+" << endl;
+}
 
-	for (unsigned int i = 0; i < 9; i++)
-	{
-		print_frame(a);
-		print_options(a, i);
-		if (!(cin >> target) || target > '9' || target < '0')
-		{
-			cout << "An error has occured while reading input data";
-			exit(EXIT_FAILURE);
+int choice(int move, char turn, char *a) {
+	int cell;
+	string str;
+	getline(cin, str);
+	istringstream stream(str);
+	stream >> cell;
+	while (cell < 1 || cell >(11 - move)) {
+		cout << endl << "Wrong move!" << endl;
+		getline(cin, str);
+		istringstream stream(str);
+		stream >> cell;
+	}
+	int j = 0;
+	for (int i = 0; i < 10; i++) {
+		if (a[i] == ' ') {
+			j++;
 		}
-		cin.get();
-		if (target == '0') 
-		{
-			cout << endl << "exit";
-			exit(EXIT_SUCCESS);
-		}
-
-		if (!(sign(a, target, i)))
-		{
-			cout << endl << "Wrong move" << endl;
-			i--;
-		}
-		else
-		{
-			if (win(a))
-			{
-				cout << endl << "Player ";
-				choice(i);
-				cout << " Won" << endl;
-				print_frame(a);
-				break;
-			}
+		if (j == cell) {
+			a[i] = turn;
+			cells(a);
+			return 0;
 		}
 	}
-	cout << endl << "Game Over" << endl;
+	if (cell == quit) {
+		cout << "GAME OVER!" << endl;
+		ex = quit;
+		return -1;
+	}
 	return 0;
 }
 
-void print_options(unsigned char * a, unsigned char turn)
-{
-	for (unsigned int i = 0; i < 9; i++)
-	{
-		if (a[i] == 0)
-		{
-			cout << i + 1 << ". mark cell ";
-			switch (i)
-			{
+char check(char *a) {
+	for (int i = 0; i < 3; i++) {
 
-			case  0: {cout << "a" << i + 1 << " as ";
-				choice(turn);
-				break; }
-			case  1: {cout << "a" << i + 1 << " as ";
-				choice(turn);
-				break; }
-			case  2: {cout << "a" << i + 1 << " as ";
-				choice(turn);
-				break; }
-			case  3: {cout << "b" << (i % 3) + 1 << " as ";
-				choice(turn);
-				break; }
-			case  4: {cout << "b" << (i % 3) + 1 << " as ";
-				choice(turn);
-				break; }
-			case  5: {cout << "b" << (i % 3) + 1 << " as ";
-				choice(turn);
-				break; }
-			case  6: {cout << "c" << (i % 3) + 1 << " as ";
-				choice(turn);
-				break; }
-			case  7: {cout << "c" << (i % 3) + 1 << " as ";
-				choice(turn);
-				break; }
-			case  8: {cout << "c" << (i % 3) + 1 << " as ";
-				choice(turn);
-				break; }
-			}
-			cout << endl;
+		if ((a[i * 3] == a[i * 3 + 1] && a[i * 3 + 1] == a[i * 3 + 2]) && a[i * 3] != ' ') {
+
+			return a[i];;
+		}
+
+		if ((a[i] == a[i + 3] && a[i + 3] == a[i + 6]) && a[i] != ' ') {
+			return a[i];
+		}
+
+		if (((a[2] == a[4] && a[4] == a[6]) && a[2] != ' ') || ((a[0] == a[4] && a[4] == a[8]) && a[0] != ' ')) {
+
+			return a[i];
 		}
 	}
-	cout << "0. quit" << endl;
+
+	return ' ';
+
 }
 
-void print_frame(unsigned char * a)
-{
-	cout << " ";
-	for (unsigned int i = 1; i < 4; i++)
+int main() {
+	char win;
+	char a[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+	char turn;
+	cells(a);
+	for (int move = 1; move <= 9; move++)
 	{
-		cout.width(4);
-		cout << i;
-	}
-	cout << endl;
-	for (unsigned int i = 0; i < 9; i++)
-	{
-		switch (i)
+		if (move % 2)
 		{
-		case 0: {cout << "  +---+---+---+" << endl << "a |"; break; }
-		case 3: {cout << endl << "  +---+---+---+" << endl << "b |"; break; }
-		case 6: {cout << endl << "  +---+---+---+" << endl << "c |"; break; }
+			turn = 'X';
+			options(turn, a);
+			choice(move, turn, a);
 		}
-		switch (a[i])
+		else
 		{
-		case 0: {cout << "   |"; break; }
-		case 1: {cout << " X |"; break; }
-		case 2: {cout << " O |"; break; }
+			turn = 'O';
+			options(turn, a);
+			choice(move, turn, a);
+		}
+		if (quit == ex)
+			return -1;
+		if (move >= 5) 
+			check(a);
+		char  win = check(a);
+		if (win == 'X')
+		{
+			cout << "Player X wins!" << endl;
+				return -1;
+		}
+		if (win == 'O')
+		{
+			cout << "Player O wins!" << endl;
+				return -1;
+		}
+		if (move == 9 && win != 'X' && win != 'O')
+		{
+			cout << "Draw!" << endl;
+				return -1;
 		}
 	}
-	cout << endl << "  +---+---+---+" << endl;
+	if (quit == ex)
+		return -1;
+	return 0;
 }
